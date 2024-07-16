@@ -2,7 +2,8 @@ import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
 import { getPictures } from './js/pixabay-api.js';
-import { createMarkup, onSearchError, buttonService } from './js/render-functions';
+import { createMarkup, onSearchError, onFetchError, buttonService } from './js/render-functions';
+
 
 const formSearch = document.querySelector('.form-search');
 const cardContainer = document.querySelector('.card-container');
@@ -43,6 +44,13 @@ async function handlerSearch(event) {
     try {
         const { hits, totalHits } = await getPictures(params);
         
+        if (hits.length === 0) {
+            onFetchError();
+            buttonService.hide(loadMoreBtn);
+            form.reset();
+            return;
+        }
+
         params.maxPage = Math.ceil(totalHits / params.pageSize);
         createMarkup(hits, cardContainer);  
 
@@ -55,6 +63,9 @@ async function handlerSearch(event) {
 
     } catch (err) {
         console.error('Error fetching pictures:', err);
+        onFetchError();
+    } finally {
+        form.reset();
     }
 }
 
