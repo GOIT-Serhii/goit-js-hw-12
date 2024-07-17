@@ -1,8 +1,11 @@
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 import { getPictures } from './js/pixabay-api.js';
-import { createMarkup, onSearchError, onFetchError, buttonService } from './js/render-functions';
+import { createMarkup, onSearchError, onFetchError, buttonService,} from './js/render-functions';
+
 
 
 const formSearch = document.querySelector('.form-search');
@@ -19,6 +22,15 @@ const params = {
     orientation: 'horizontal',
     safeSearch: 'true',
 };
+
+    const lightbox = new SimpleLightbox('.card-container a', {
+        captions: true,
+        captionsData: 'alt',
+        captionPosition: 'bottom',
+        captionDelay: 250,
+    });
+
+    
 buttonService.hide(loadMoreBtn);
 
 formSearch.addEventListener('submit', handlerSearch);
@@ -49,10 +61,12 @@ async function handlerSearch(event) {
             buttonService.hide(loadMoreBtn);
             form.reset();
             return;
+            
         }
 
         params.maxPage = Math.ceil(totalHits / params.pageSize);
         createMarkup(hits, cardContainer);  
+        lightbox.refresh();
 
         if (hits.length > 0 && params.page < params.maxPage) {
             buttonService.enable(loadMoreBtn, spinner);
@@ -77,16 +91,19 @@ async function handlerLoadMore() {
         const { hits } = await getPictures(params);
         createMarkup(hits, cardContainer);  
         smoothScroll();
+        lightbox.refresh();
+
     } catch (err) {
-        iziToast.error({
-            message: 'We\'re sorry, but you\'ve reached the end of search results.',
-        });
+  console.log(err);
     } finally {
         buttonService.enable(loadMoreBtn, spinner);
         
         if (params.page === params.maxPage) {
             buttonService.hide(loadMoreBtn);
             loadMoreBtn.removeEventListener('click', handlerLoadMore);
+                iziToast.error({
+            message: 'We\'re sorry, but you\'ve reached the end of search results.',
+        });
         }
     }
 }
@@ -98,5 +115,4 @@ function smoothScroll() {
         behavior: 'smooth',
     });
 }
-
 

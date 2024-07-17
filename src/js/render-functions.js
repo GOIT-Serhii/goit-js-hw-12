@@ -1,8 +1,7 @@
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
+
 
 export function createMarkup(hits, cardContainer) {
     const markup = hits.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
@@ -34,15 +33,6 @@ export function createMarkup(hits, cardContainer) {
     }).join('');
 
     cardContainer.insertAdjacentHTML('beforeend', markup);
-
-    const lightbox = new SimpleLightbox('.card-container a', {
-        captions: true,
-        captionsData: 'alt',
-        captionPosition: 'bottom',
-        captionDelay: 250,
-    });
-
-    lightbox.refresh();
 }
 
 export function onFetchError() {
@@ -78,3 +68,4 @@ function enable(button, spinner) {
 }
 
 export const buttonService = { show, disable, hide, enable };
+
